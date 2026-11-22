@@ -1,26 +1,124 @@
 /* transparency */
+/* Zen Glass rebuild for chat.mistral.ai (Vibe by Mistral) — 2026-11
+   The whole page stack paints nothing, so the browser's window
+   opacity / wallpaper shows through. Empirically verified against
+   the current Tailwind + shadcn/ui DOM (sidebar, rail, composer,
+   bubbles, floating menus). Floating layers (menus, popovers)
+   keep real frosted glass because page content sits behind them. */
+
+/* generic stack — html/body/shell/wrapper first */
 html,
 body,
 nav,
 header,
-.app-root,
-#pass-sidebar,
-#main,
-#content,
-section,
-main > div,
+main,
+main[class*="shell"],
+[class*="sidebar-wrapper"],
+main[class*="bg-sidebar"],
 .bg-sidebar-subtle,
-.bg-subtle,
-main .group\/sidebar-wrapper,
-div.from-sidebar.via-transparent,
-[data-side="left"] > div {
+.bg-subtle {
   background-color: transparent !important;
   background: none !important;
-  border: none !important;
-  box-shadow: none !important;
   transition:
     background-color 0.5s ease-in-out,
-    background 0.5s ease-in-out,
-    border 0.5s ease-in-out,
-    box-shadow 0.5s ease-in-out !important;
+    background 0.5s ease-in-out !important;
+}
+
+/* sidebar — outer aside, inner surfaces and the collapsed icon rail */
+aside[class*="w-(--sidebar-width)"],
+aside aside [class*="group-data-[variant=floating]"],
+[class*="bg-sidebar"]:not([class*="sidebar-wrapper"]):not(main) {
+  background: transparent !important;
+}
+
+/* decorative black coats the app paints on the sidebar */
+aside[class*="w-(--sidebar-width)"]::after,
+[class*="bg-sidebar"]::before {
+  background: transparent !important;
+}
+
+/* collapsed rail: drag grips + active menu-item sliver */
+[class*="bg-basic-gray-alpha-4"][class*="absolute"][class*="top-0"][class*="bottom-0"],
+[class*="peer/menu-button"] {
+  background: transparent !important;
+}
+
+/* AI bubbles: pure transparency, no tint */
+[class*="group/message"] [class*="bg-basic-gray-alpha"] {
+  background: transparent !important;
+}
+
+/* composer: keeps a subtle ring, paints nothing */
+div:has(.rich-text-editor):not(:has(div:has(.rich-text-editor))) {
+  background: transparent !important;
+  border: 1px solid rgba(127, 127, 127, 0.15) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(127, 127, 127, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.18) !important;
+}
+.rich-text-editor:focus,
+.ProseMirror:focus {
+  outline: none !important;
+}
+
+/* code blocks */
+.markdown-fenced-code-root {
+  background: transparent !important;
+  border-radius: 12px !important;
+}
+
+/* scroll fade strips at the top and bottom of the chat view:
+   masks/gradients would read as opaque black bars in transparency */
+.pointer-events-none[class*="inset-x-4"][class*="top-0"],
+.pointer-events-none[class*="inset-x-4"][class*="bottom-0"],
+.pointer-events-none[class*="bg-subtle/80"] {
+  display: none !important;
+}
+
+/* no disclaimer footer ("...can make mistakes") */
+p:has(> a[href*="/legal/terms"]),
+span:has(> a[href*="/legal/terms"]),
+div:has(> a[href*="/legal/terms"]) {
+  display: none !important;
+}
+
+/* floating glass: menus and popovers open OVER page content,
+   so backdrop blur has real material to sample */
+[class*="bg-card"][class*="z-50"],
+[class*="bg-popover"] {
+  background: rgba(20, 20, 23, 0.6) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
+  backdrop-filter: blur(24px) saturate(120%) !important;
+}
+
+/* day mode: light glass instead of dark */
+@media (prefers-color-scheme: light) {
+  [class*="bg-card"][class*="z-50"],
+  [class*="bg-popover"] {
+    background: rgba(245, 245, 247, 0.65) !important;
+  }
+  div:has(.rich-text-editor):not(:has(div:has(.rich-text-editor))) {
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  }
+}
+
+/* misc dress-up */
+::selection {
+  background: rgba(120, 160, 255, 0.35) !important;
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(127, 127, 127, 0.3);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }
